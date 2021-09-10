@@ -33,10 +33,6 @@ contract('Color', (accounts) => {
 
     describe('minting', async() => {
         
-        beforeEach(async() => {
-            contract = await Color.deployed();
-        });
-
         it('creates a new token successfully', async() => {
             const colorValue = '#FFFFFF';
             const result = await contract.mint(colorValue);
@@ -52,6 +48,29 @@ contract('Color', (accounts) => {
             // Failure: fails when minting the same color twice
             await contract.mint(colorValue).should.be.rejected;
         });
-        
+    });
+
+    describe('indexing', async() => {
+        it('lists colors', async() => {
+            // including color previously minted
+            let expectedColors = ['#FFFFFF', '150050', '#000000', '#4A0E4E'];
+            // Mint 3 MORE tokens
+            await contract.mint(expectedColors[1]);
+            await contract.mint(expectedColors[2]);
+            await contract.mint(expectedColors[3]);
+            const totalSupply = await contract.totalSupply();
+
+            let result = []
+
+            for (let i = 0; i < totalSupply; i++) {
+                let color = await contract.colors(i);
+                result.push(color);
+            }
+
+            assert.equal(result[0], '#FFFFFF'); // from first minting test
+            assert.equal(result[1], expectedColors[1]);
+            assert.equal(result[2], expectedColors[2]);
+            assert.equal(result[3], expectedColors[3]);
+        });
     });
 })
