@@ -1,8 +1,42 @@
 import React, { Component } from 'react';
 import logo from '../logo.png';
 import './App.css';
+import detectEthereumProvider from '@metamask/detect-provider'
 
 class App extends Component {
+
+  async componentDidMount() {
+    await this.loadWeb3();
+    await this.loadBlockchainData();
+  }
+
+  async loadWeb3() {
+    const provider = await detectEthereumProvider()
+
+    if (provider) {
+      console.log('Ethereum successfully detected!')
+      // Legacy providers may only have ethereum.sendAsync
+      const chainId = await provider.request({
+        method: 'eth_chainId'
+      })
+    } else {
+      console.error('Please install MetaMask!')
+    }
+  }
+
+  async loadBlockchainData() {
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    const account = accounts[0];
+    this.setState({ account });
+  }
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      account: ''
+    };
+  }
+
   render() {
     return (
       <div>
@@ -13,8 +47,13 @@ class App extends Component {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Dapp University
+            Color Tokens
           </a>
+          <ul className="navbar-nav px-3">
+            <li className="nav-item text-nowrap d-none d-sm-none d-sm-block">
+              <small className="text-white"><span id="account">{this.state.account}</span></small>
+            </li>
+          </ul>
         </nav>
         <div className="container-fluid mt-5">
           <div className="row">
