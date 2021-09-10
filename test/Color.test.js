@@ -7,7 +7,7 @@ require('chai')
 contract('Color', (accounts) => {
     let contract;
 
-    before(async() => {
+    beforeEach(async() => {
         contract = await Color.deployed();
     });
 
@@ -30,4 +30,28 @@ contract('Color', (accounts) => {
             expect(symbol).to.eql('COLOR');
         });
     })
+
+    describe('minting', async() => {
+        
+        beforeEach(async() => {
+            contract = await Color.deployed();
+        });
+
+        it('creates a new token successfully', async() => {
+            const colorValue = '#FFFFFF';
+            const result = await contract.mint(colorValue);
+            const totalSupply = await contract.totalSupply();
+            const event = result.logs[0].args
+            
+            // Success
+            assert.equal(totalSupply, 1);
+            assert.equal(event.tokenId.toNumber(), 1, 'id is correct');
+            assert.equal(event.from, 0x0000000000000000000000000000000000000000, '`from` is correct');
+            assert.equal(event.to, accounts[0], '`to` is correct');
+
+            // Failure: fails when minting the same color twice
+            await contract.mint(colorValue).should.be.rejected;
+        });
+        
+    });
 })
