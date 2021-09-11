@@ -37,11 +37,11 @@ class App extends Component {
       )
       this.setState({ colorContract });
       console.log('this.state.colorContract :>> ', this.state.colorContract);
-      
+
       const totalSupply = await colorContract.totalSupply().then(bigNum => bigNum.toNumber());
       this.setState({ totalSupply });
       console.log('this.state.totalSupply :>> ', this.state.totalSupply);
-      
+
       for (let i = 0; i < totalSupply; i++) {
         let c = await colorContract.colors(i);
         this.setState({
@@ -54,6 +54,16 @@ class App extends Component {
     } else {
       window.alert('We have detected you switched networks. Please switch to the Ethereum Mainnet.')
     }
+  }
+
+  mint = async(color) => {
+    console.log('color :>> ', color);
+    const result = await this.state.colorContract.mint(color)
+    console.log('result :>> ', result);
+    result.wait().then((res) => {
+      console.log('res :>> ', res);
+      this.setState({ colors: [... this.state.colors, color] })
+    })
   }
 
   constructor(props) {
@@ -82,7 +92,7 @@ class App extends Component {
           </a>
           <ul className="navbar-nav px-3">
             <li className="nav-item text-nowrap d-none d-sm-none d-sm-block">
-              <img src={logo} className="App-logo" alt="logo" />
+              <img src={logo} className="app-logo" alt="logo" />
             </li>
           </ul>
           <ul className="navbar-nav px-3">
@@ -94,22 +104,46 @@ class App extends Component {
           </ul>
         </nav>
         {/* Hacky formatting... */}
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
         <div className="container-fluid mt-5">
           <div className="row">
             <main role="main" className="col-lg-12 d-flex text-center">
               <div className="content mr-auto ml-auto">
-                {/* FORM GOES HERE */}
+                <h1>Issue Token</h1>
+                <form onSubmit={(event) => {
+                  event.preventDefault();
+                  const color = this.color.value;
+                  this.mint(color);
+                }}>
+                  <input
+                    type='text'
+                    className='form-control mb-1'
+                    placeholder='e.g. #FFFFFF'
+                    ref={(input) => { this.color = input }}
+                  />
+                  <input
+                    type='submit'
+                    className='btn btn-block btn-primary'
+                    value='Mint'
+                  />
+                </form>
               </div>
             </main>
           </div>
           <hr />
           <div className="row text-center">
-            <p>Tokens go here...</p>
+            {this.state.colors.map((color, key) => {
+              return (
+                <div key={key} className="col-md-3 mb-3">
+                  <div className="color-token" style={{ backgroundColor: color }}></div>
+                  <div>{color}</div>
+                </div>
+              )
+            })}
           </div>
         </div>
       </div>

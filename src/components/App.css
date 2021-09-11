@@ -1,5 +1,10 @@
-/* Styles go here */
-
-.App-logo {
+.app-logo {
     height: 5em;
+}
+
+.color-token {
+    height: 10em;
+    width: 10em;
+    border-radius: 50%;
+    display: inline-block;
 }
