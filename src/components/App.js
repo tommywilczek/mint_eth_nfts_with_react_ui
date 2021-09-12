@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import logo from '../logo.png';
 import './App.css';
-import Color from '../abis/Color.json';
+import EthereumColors from '../abis/EthereumColors.json';
 import { ethers, Contract } from 'ethers';
 
 class App extends Component {
@@ -28,11 +28,11 @@ class App extends Component {
     const formattedBalance = ethers.utils.formatEther(balance);
     this.setState({ balance: formattedBalance });
 
-    const networkData = Color.networks[window.ethereum.networkVersion];
+    const networkData = EthereumColors.networks[window.ethereum.networkVersion];
     if (networkData) {
       const colorContract = new Contract(
         networkData.address,
-        Color.abi,
+        EthereumColors.abi,
         signer
       )
       this.setState({ colorContract });
@@ -66,6 +66,17 @@ class App extends Component {
     })
   }
 
+  getMetadata = async(color) => {
+    // console.log('color :>> ', color);
+    // const result = await this.state.colorContract.getTokenIdForColor(color);
+    // console.log('result :>> ', result);
+    // result.wait().then((res) => {
+    //   console.log('res :>> ', res);
+    // })
+    const result = await this.state.colorContract.getMetadataForColor(color);
+    console.log('metadata :>> ', result);
+  }
+
   constructor(props) {
     super(props);
     this.state = {
@@ -88,7 +99,7 @@ class App extends Component {
             target="_blank"
             rel="noopener noreferrer"
           >
-            Color Tokens
+            Ethereum Colors
           </a>
           <ul className="navbar-nav px-3">
             <li className="nav-item text-nowrap d-none d-sm-none d-sm-block">
@@ -141,6 +152,14 @@ class App extends Component {
                 <div key={key} className="col-md-3 mb-3">
                   <div className="color-token" style={{ backgroundColor: color }}></div>
                   <div>{color}</div>
+                  <button
+                    onClick={(event) => {
+                      this.getMetadata(color);
+                    }}
+                    className='btn btn-block btn-secondary'
+                  >
+                    Log metadata
+                  </button>
                 </div>
               )
             })}

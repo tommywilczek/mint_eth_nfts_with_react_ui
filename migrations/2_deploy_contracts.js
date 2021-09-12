@@ -1,5 +1,5 @@
-const Migrations = artifacts.require("Color");
+const Migrations = artifacts.require("EthereumColors");
 
-module.exports = function(deployer) {
-  deployer.deploy(Migrations);
+module.exports = async function(deployer) {
+  await deployer.deploy(Migrations);
 };
