@@ -47,9 +47,9 @@ contract EthereumColors is ERC721URIStorage {
     // Make this bytes32 or smaller??
     function mint(string  memory _color) external onlyHexColor(bytes(_color)) {
         require(!_colorExists[_color], 'Color exists');
-        colors.push(_color);
         uint _id = colors.length;
         _safeMint(msg.sender, _id);
+        colors.push(_color);
         _colorExists[_color] = true; // maybe remove and use tokenIdToColor?
         colorToTokenId[_color] = _id;
         string memory tokenUri = getTokenUriForColor(_color);
@@ -90,14 +90,16 @@ contract EthereumColors is ERC721URIStorage {
         return imageUri;
     }
 
+    // EXTERNAL URL IS INVALID... CHANGE
     function formatTokenUri(string memory _color, string memory _imageUri) public pure returns (string memory) {
         string memory baseUri = "data:application/json;base64,";
         string memory json = string(abi.encodePacked(
-            '{"name": "', _color, 
-            '", "description": "Proof of ownership of the first color ',
-            _color, ' minted on the Ethereum blockchain.',
-            '", "image": "', _imageUri,
-            '"}'
+            '{',
+                '"name": "', _color, 
+                '", "description": "Proof of ownership of the original color ',
+                _color, ' minted on the Ethereum blockchain.',
+                '", "image": "', _imageUri, '"',
+            '}'
         ));
         string memory encodedJson = Base64.encode(bytes(json));
         string memory tokenUri = string(abi.encodePacked(baseUri, encodedJson));
